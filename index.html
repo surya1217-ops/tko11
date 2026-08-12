@@ -84,7 +84,7 @@ video{ width:100%; margin-top:10px; border-radius:10px; background:#000; }
 .qty span{ min-width:25px; text-align:center; font-weight:bold; }
 .cart-total{ text-align:right; margin-top:20px; font-size:20px; font-weight:bold; color:#075da8; }
 
-.modal{ position:fixed; inset:0; background:rgba(0,0,0,0.6); display:flex; justify-content:center; align-items:center; padding:20px; z-index:1000; }
+.modal{ position:fixed; inset:0; background:rgba(0,0,0,0.6); display:flex; justify-content:center; align-items:center; padding:20px; z-index:9999; }
 .modal-box{ background:white; width:100%; max-width:550px; max-height:90vh; overflow-y:auto; border-radius:20px; padding:25px; }
 .modal-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
 
@@ -106,7 +106,7 @@ footer{ text-align:center; padding:25px; color:#64748b; }
 
 <body>
 
-<!-- LOGIN -->
+<!-- LOGIN PAGE -->
 <div id="loginPage">
     <div class="login-box">
         <h2>GadgetStore Pro</h2>
@@ -284,6 +284,7 @@ footer{ text-align:center; padding:25px; color:#64748b; }
 </div>
 
 <script>
+// INITIAL STORAGE & DUMMY DATA
 const defaultProducts = [
     {
         id: "1",
@@ -303,6 +304,7 @@ function rupiah(number){ return new Intl.NumberFormat("id-ID", { style:"currency
 
 let editingId = null;
 
+// AUTHENTICATION SYSTEM
 function login(){
     const role = document.getElementById("role").value;
     const username = document.getElementById("username").value.trim();
@@ -358,7 +360,7 @@ function logout(){
     location.reload();
 }
 
-/* ================= CUSTOMER LOGIC ================= */
+/* CUSTOMER SYSTEM */
 function getCart(){
     const username = localStorage.getItem("loggedUser") || "guest";
     try { return JSON.parse(localStorage.getItem("cart_" + username) || "[]"); } catch(e) { return []; }
@@ -433,8 +435,14 @@ function renderProducts(){
     `).join("");
 }
 
-function openCart(){ renderCart(); document.getElementById("cartModal").classList.remove("hidden"); }
-function closeCart(){ document.getElementById("cartModal").classList.add("hidden"); }
+function openCart(){ 
+    renderCart(); 
+    document.getElementById("cartModal").classList.remove("hidden"); 
+}
+
+function closeCart(){ 
+    document.getElementById("cartModal").classList.add("hidden"); 
+}
 
 function renderCart(){
     const container = document.getElementById("cartItems");
@@ -580,7 +588,7 @@ function renderOrders(){
     `}).join("");
 }
 
-/* ================= ADMIN LOGIC ================= */
+/* ADMIN SYSTEM */
 function compressImage(file) {
     return new Promise((resolve) => {
         const reader = new FileReader();
@@ -654,6 +662,7 @@ document.getElementById("productForm").addEventListener("submit", async function
         editingId = null;
         document.getElementById("cancelEdit").classList.add("hidden");
         document.getElementById("formTitle").textContent = "➕ Tambah Produk Baru";
+        document.getElementById("productImage").setAttribute("required", "");
     } else {
         let image = await compressImage(imageFile);
         let video = videoFile ? await fileToBase64(videoFile) : "";
@@ -665,12 +674,14 @@ document.getElementById("productForm").addEventListener("submit", async function
         localStorage.setItem("products", JSON.stringify(products));
         alert("Berhasil menyimpan produk!");
     } catch(err) {
-        alert("Ukuran video/gambar masih terlalu besar.");
+        alert("Ukuran file terlalu besar.");
     }
 
     document.getElementById("productForm").reset();
     document.getElementById("imagePreview").style.display = "none";
     document.getElementById("videoPreview").style.display = "none";
+    document.getElementById("imageName").textContent = "";
+    document.getElementById("videoName").textContent = "";
     renderAdminProducts();
 });
 
@@ -715,6 +726,8 @@ function editProduct(id){
     document.getElementById("productImage").removeAttribute("required");
     document.getElementById("cancelEdit").classList.remove("hidden");
     document.getElementById("formTitle").textContent = "✏️ Edit Produk";
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function cancelEdit(){
@@ -723,6 +736,8 @@ function cancelEdit(){
     document.getElementById("cancelEdit").classList.add("hidden");
     document.getElementById("formTitle").textContent = "➕ Tambah Produk Baru";
     document.getElementById("productImage").setAttribute("required", "");
+    document.getElementById("imagePreview").style.display = "none";
+    document.getElementById("videoPreview").style.display = "none";
 }
 
 function deleteProduct(id){
@@ -770,7 +785,7 @@ function changeStatus(id, newStatus){
     }
 }
 
-// Check session saat load
+// AUTO CHECK SESSION ON LOAD
 const loggedUser = localStorage.getItem("loggedUser");
 if(loggedUser){
     showApp();
