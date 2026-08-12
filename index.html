@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GadgetStore Pro</title>
+
+<style>
+*{ box-sizing:border-box; margin:0; padding:0; font-family:Arial,sans-serif; }
+body{ background:#eef8ff; color:#172033; }
+
+header{
+    background:linear-gradient(135deg, #071b33, #0b63ce, #72d7ff);
+    color:white; padding:25px; text-align:center; box-shadow:0 5px 20px #0002;
+}
+header h1{ font-size:30px; }
+header p{ margin-top:7px; opacity:.9; }
+
+.container{ width:92%; max-width:1200px; margin:25px auto; }
+.card{ background:white; border-radius:18px; padding:25px; margin-bottom:25px; box-shadow:0 8px 25px #0878c522; border:1px solid #d7edff; }
+
+/* LOGIN PAGE */
+#loginPage{
+    min-height:100vh; display:flex; justify-content:center; align-items:center;
+    background:linear-gradient(135deg, #06182c, #0878d1, #9be9ff);
+}
+.login-box{ background:white; width:90%; max-width:420px; padding:35px; border-radius:25px; box-shadow:0 20px 50px #0005; }
+.login-box h2{ text-align:center; color:#0967bd; margin-bottom:8px; }
+.login-box p{ text-align:center; color:#718096; margin-bottom:25px; }
+
+input, select, textarea{ width:100%; padding:13px; border:1px solid #cbd5e1; border-radius:10px; margin:7px 0 15px; outline:none; }
+input:focus, select:focus, textarea:focus{ border-color:#0785e8; }
+textarea{ min-height:90px; resize:vertical; }
+
+button, .btn{ border:0; padding:12px 18px; border-radius:10px; cursor:pointer; font-weight:bold; background:#0878d1; color:white; transition:.2s; }
+button:hover, .btn:hover{ transform:translateY(-2px); }
+button:disabled{ background:#cbd5e1!important; cursor:not-allowed; transform:none!important; }
+
+.success{ background:#08a66a; }
+.delete, .danger, .close{ background:#ef4444; }
+.edit{ background:#f59e0b; }
+.back{ background:#475569; }
+.cart-btn, .buy{ background:#08a66a; }
+
+.nav, .topbar{ display:flex; justify-content:space-between; align-items:center; gap:15px; flex-wrap:wrap; }
+.user-info{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+
+.section-title{ margin-bottom:18px; color:#075da8; }
+.products, .product-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:20px; }
+
+.product{
+    border:1px solid #d9ecfa; border-radius:18px; overflow:hidden; background:white;
+    box-shadow:0 5px 18px #0878d11c; transition:.2s; display:flex; flex-direction:column; justify-content:space-between;
+}
+.product:hover{ transform:translateY(-4px); box-shadow:0 10px 25px #0878d133; }
+.product img{ width:100%; height:190px; object-fit:cover; }
+.product-body{ padding:18px; display:flex; flex-direction:column; flex:1; justify-content:space-between; }
+.price{ color:#0878d1; font-size:21px; font-weight:bold; margin:10px 0 4px; }
+.desc, .product-desc{ color:#64748b; line-height:1.5; font-size:13px; margin-bottom:10px; }
+
+.stock-badge{ display:inline-block; padding:4px 10px; border-radius:6px; font-size:12px; font-weight:bold; margin-bottom:10px; background:#e0f2fe; color:#0369a1; }
+.stock-badge.out-of-stock{ background:#fee2e2; color:#b91c1c; }
+
+video{ width:100%; margin-top:10px; border-radius:10px; background:#000; }
+
+.order{ border:1px solid #dcebf5; padding:18px; border-radius:14px; margin:12px 0; background:#fbfdff; }
+.order select{ max-width:350px; margin-top:10px; }
+.tracking{ display:flex; align-items:center; justify-content:center; margin-top:18px; overflow-x:auto; }
+.step{ text-align:center; min-width:70px; color:#94a3b8; }
+.circle{ width:42px; height:42px; margin:auto; border-radius:50%; background:#e2e8f0; display:flex; justify-content:center; align-items:center; }
+.step.active{ color:#0878d1; font-weight:bold; }
+.step.active .circle{ background:#0878d1; color:white; }
+.step.done{ color:#08a66a; font-weight:bold; }
+.step.done .circle{ background:#08a66a; color:white; }
+.line{ height:4px; flex:1; max-width:80px; background:#e2e8f0; }
+.line.done{ background:#08a66a; }
+
+.cart-item{ display:flex; align-items:center; gap:15px; padding:15px 0; border-bottom:1px solid #e2e8f0; }
+.cart-item img{ width:70px; height:70px; object-fit:cover; border-radius:10px; }
+.cart-info{ flex:1; }
+.cart-price{ color:#0878d1; font-weight:bold; margin-top:5px; }
+.qty{ display:flex; align-items:center; gap:7px; margin-top:8px; }
+.qty button{ padding:4px 10px; }
+.qty span{ min-width:25px; text-align:center; font-weight:bold; }
+.cart-total{ text-align:right; margin-top:20px; font-size:20px; font-weight:bold; color:#075da8; }
+
+.modal{ position:fixed; inset:0; background:rgba(0,0,0,0.6); display:flex; justify-content:center; align-items:center; padding:20px; z-index:1000; }
+.modal-box{ background:white; width:100%; max-width:550px; max-height:90vh; overflow-y:auto; border-radius:20px; padding:25px; }
+.modal-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+
+.payment{ border:1px solid #dcebf5; border-radius:12px; padding:15px; margin:10px 0; }
+.payment input{ width:auto; margin:0 8px 0 0; }
+.payment label{ cursor:pointer; font-weight:bold; }
+.payment-detail{ display:none; margin-top:12px; padding:15px; background:#eff8ff; border-radius:10px; border-left:5px solid #0878d1; }
+.checkout-total{ background:#e8f6ff; padding:15px; border-radius:12px; margin:15px 0; font-size:18px; font-weight:bold; }
+
+.upload-box{ border:2px dashed #9bd5f5; background:#f4fbff; padding:18px; border-radius:12px; margin-bottom:15px; }
+.preview{ display:none; margin-top:10px; max-width:250px; max-height:180px; border-radius:10px; }
+.file-name{ margin-top:8px; color:#64748b; font-size:13px; }
+
+.empty{ text-align:center; padding:30px; color:#64748b; }
+.hidden{ display:none!important; }
+footer{ text-align:center; padding:25px; color:#64748b; }
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div id="loginPage">
+    <div class="login-box">
+        <h2>GadgetStore Pro</h2>
+        <p>Login ke GadgetStore</p>
+
+        <label>Login sebagai</label>
+        <select id="role">
+            <option value="customer">Customer</option>
+            <option value="admin">Administrator</option>
+        </select>
+
+        <label>Username</label>
+        <input type="text" id="username" placeholder="Masukkan username">
+
+        <label>Password</label>
+        <input type="password" id="password" placeholder="Masukkan password">
+
+        <button onclick="login()" style="width:100%">Login</button>
+        <p id="loginMessage" style="color:#ef4444;margin-top:15px;text-align:center"></p>
+    </div>
+</div>
+
+<!-- APP CUSTOMER -->
+<div id="customerApp" class="hidden">
+    <header>
+        <h1>GadgetStore Management System</h1>
+        <p>Premium Technology Marketplace</p>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <div class="nav">
+                <div>
+                    <h2>🛍️ Panel Pembeli</h2>
+                    <p>Selamat datang, <b id="welcome"></b></p>
+                </div>
+                <div class="user-info">
+                    <button class="cart-btn" onclick="openCart()">
+                        🛒 Keranjang (<span id="cartCount">0</span>)
+                    </button>
+                    <button class="danger" onclick="logout()">Keluar</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="section-title">📱 Katalog Produk</h2>
+            <div id="products" class="products"></div>
+        </div>
+
+        <div class="card">
+            <h2 class="section-title">📦 Status Pesanan Saya</h2>
+            <div id="orders"></div>
+        </div>
+    </div>
+
+    <footer>© 2026 GadgetStore Pro — Prototype E-Commerce</footer>
+</div>
+
+<!-- APP ADMIN -->
+<div id="adminApp" class="hidden">
+    <header>
+        <h1>GadgetStore Management System</h1>
+        <p>Administrator Dashboard</p>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <div class="topbar">
+                <div>
+                    <h2 style="color:#075da8">⚙️ Panel Administrator</h2>
+                    <p>Login sebagai: <b>admin</b></p>
+                </div>
+                <div>
+                    <button class="danger" onclick="logout()">Keluar</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 id="formTitle" style="color:#075da8">➕ Tambah Produk Baru</h2>
+            <form id="productForm">
+                <label>Nama Produk</label>
+                <input type="text" id="productName" placeholder="Contoh: Smartphone Galaxy Ultra" required>
+
+                <label>Harga Produk (Rp)</label>
+                <input type="number" id="productPrice" placeholder="Contoh: 12000000" min="0" required>
+
+                <label>Stok Barang</label>
+                <input type="number" id="productStock" placeholder="Contoh: 15" min="0" required>
+
+                <label>Deskripsi Produk</label>
+                <textarea id="productDesc" placeholder="Masukkan spesifikasi produk..." required></textarea>
+
+                <div class="upload-box">
+                    <label>📷 Upload Foto Produk</label>
+                    <input type="file" id="productImage" accept="image/*" required>
+                    <div id="imageName" class="file-name"></div>
+                    <img id="imagePreview" class="preview">
+                </div>
+
+                <div class="upload-box">
+                    <label>🎬 Upload Video Produk (Opsional)</label>
+                    <input type="file" id="productVideo" accept="video/*">
+                    <div id="videoName" class="file-name"></div>
+                    <video id="videoPreview" class="preview" controls></video>
+                </div>
+
+                <button type="submit" class="success">💾 Simpan Produk</button>
+                <button type="button" class="back hidden" id="cancelEdit" onclick="cancelEdit()">Batal Edit</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2 style="color:#075da8">📦 Manajemen Produk</h2>
+            <div id="productList" class="product-grid"></div>
+        </div>
+
+        <div class="card">
+            <h2 style="color:#075da8">🚚 Manajemen Status Pesanan</h2>
+            <div id="orderList"></div>
+        </div>
+    </div>
+
+    <footer>© 2026 GadgetStore Pro — Administrator</footer>
+</div>
+
+<!-- CART MODAL -->
+<div id="cartModal" class="modal hidden">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h2>🛒 Keranjang Belanja</h2>
+            <button class="close" onclick="closeCart()">✕</button>
+        </div>
+        <div id="cartItems"></div>
+        <div id="cartTotal" class="cart-total"></div>
+        <button class="buy" style="width:100%;margin-top:20px" onclick="openCheckout()">💳 Checkout</button>
+    </div>
+</div>
+
+<!-- CHECKOUT MODAL -->
+<div id="checkoutModal" class="modal hidden">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h2>💳 Pembayaran</h2>
+            <button class="close" onclick="closeCheckout()">✕</button>
+        </div>
+
+        <h3>Pilih Metode Pembayaran</h3>
+
+        <div class="payment">
+            <label><input type="radio" name="payment" value="BNI" onchange="showPaymentDetail('BNI')"> 🏦 Transfer Bank BNI</label>
+            <div id="detailBNI" class="payment-detail">
+                <strong>Bank BNI</strong><br><br>Nomor Rekening: <strong>1234567890</strong><br>Atas Nama: <strong>GadgetStore Pro</strong>
+            </div>
+        </div>
+
+        <div class="payment">
+            <label><input type="radio" name="payment" value="BCA" onchange="showPaymentDetail('BCA')"> 🏦 Transfer Bank BCA</label>
+            <div id="detailBCA" class="payment-detail">
+                <strong>Bank BCA</strong><br><br>Nomor Rekening: <strong>9876543210</strong><br>Atas Nama: <strong>GadgetStore Pro</strong>
+            </div>
+        </div>
+
+        <div class="payment">
+            <label><input type="radio" name="payment" value="DANA" onchange="showPaymentDetail('DANA')"> 💙 DANA</label>
+            <div id="detailDANA" class="payment-detail">
+                <strong>DANA</strong><br><br>Nomor DANA: <strong>081234567890</strong><br>Nama: <strong>GadgetStore Pro</strong>
+            </div>
+        </div>
+
+        <div id="checkoutTotal" class="checkout-total"></div>
+        <button class="buy" style="width:100%" onclick="processCheckout()">✅ Konfirmasi Pembayaran</button>
+    </div>
+</div>
+
+<script>
+const defaultProducts = [
+    {
+        id: "1",
+        name: "TWS Wireless Earphones",
+        price: 25000,
+        stock: 10,
+        desc: "Suara jernih dan nyaman dipakai seharian.",
+        image: "https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=600",
+        video: ""
+    }
+];
+
+if(!localStorage.getItem("products")){ localStorage.setItem("products", JSON.stringify(defaultProducts)); }
+if(!localStorage.getItem("orders")){ localStorage.setItem("orders", JSON.stringify([])); }
+
+function rupiah(number){ return new Intl.NumberFormat("id-ID", { style:"currency", currency:"IDR", maximumFractionDigits:0 }).format(Number(number) || 0); }
+
+let editingId = null;
+
+function login(){
+    const role = document.getElementById("role").value;
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value;
+    const msg = document.getElementById("loginMessage");
+    msg.textContent = "";
+
+    if(!username || !password){
+        msg.textContent = "Username dan password wajib diisi!";
+        return;
+    }
+
+    if(role === "admin"){
+        if(username === "admin" && password === "12345"){
+            localStorage.setItem("loggedUser", "admin");
+            localStorage.setItem("loggedRole", "admin");
+            showApp();
+        } else {
+            msg.textContent = "Username/password Admin salah! (admin / 12345)";
+        }
+        return;
+    }
+
+    localStorage.setItem("loggedUser", username);
+    localStorage.setItem("loggedRole", "customer");
+    showApp();
+}
+
+function showApp(){
+    const role = localStorage.getItem("loggedRole");
+    const user = localStorage.getItem("loggedUser");
+
+    document.getElementById("loginPage").classList.add("hidden");
+
+    if(role === "admin"){
+        document.getElementById("adminApp").classList.remove("hidden");
+        document.getElementById("customerApp").classList.add("hidden");
+        renderAdminProducts();
+        renderAdminOrders();
+    } else {
+        document.getElementById("customerApp").classList.remove("hidden");
+        document.getElementById("adminApp").classList.add("hidden");
+        document.getElementById("welcome").textContent = user;
+        renderProducts();
+        renderOrders();
+        updateCartCount();
+    }
+}
+
+function logout(){
+    localStorage.removeItem("loggedUser");
+    localStorage.removeItem("loggedRole");
+    location.reload();
+}
+
+/* ================= CUSTOMER LOGIC ================= */
+function getCart(){
+    const username = localStorage.getItem("loggedUser") || "guest";
+    try { return JSON.parse(localStorage.getItem("cart_" + username) || "[]"); } catch(e) { return []; }
+}
+
+function saveCart(cart){
+    const username = localStorage.getItem("loggedUser") || "guest";
+    localStorage.setItem("cart_" + username, JSON.stringify(cart));
+}
+
+function addToCart(id){
+    const products = JSON.parse(localStorage.getItem("products") || "[]");
+    const product = products.find(p => String(p.id) === String(id));
+
+    if(!product){ alert("❌ Produk tidak ditemukan!"); return; }
+    if(product.stock <= 0){ alert("❌ Stok barang ini habis!"); return; }
+
+    let cart = getCart();
+    const existing = cart.find(item => String(item.productId) === String(product.id));
+
+    if(existing){
+        if(existing.qty >= product.stock){ alert("❌ Jumlah melebihi stok yang tersedia!"); return; }
+        existing.qty += 1;
+    } else {
+        cart.push({
+            productId: String(product.id),
+            name: product.name,
+            price: Number(product.price),
+            image: product.image || 'https://via.placeholder.com/100',
+            qty: 1
+        });
+    }
+
+    saveCart(cart);
+    updateCartCount();
+    alert("✅ " + product.name + " berhasil dimasukkan ke keranjang!");
+}
+
+function updateCartCount(){
+    const cart = getCart();
+    const count = cart.reduce((total, item) => total + Number(item.qty || 0), 0);
+    document.getElementById("cartCount").textContent = count;
+}
+
+function renderProducts(){
+    const container = document.getElementById("products");
+    const products = JSON.parse(localStorage.getItem("products") || "[]");
+
+    if(products.length === 0){
+        container.innerHTML = `<div class="empty">📦 Belum ada produk.</div>`;
+        return;
+    }
+
+    container.innerHTML = products.map(p => `
+        <div class="product">
+            <img src="${p.image}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/600x400?text=Produk'">
+            <div class="product-body">
+                <div>
+                    <h3>${p.name}</h3>
+                    <div class="price">${rupiah(p.price)}</div>
+                    <div class="stock-badge ${p.stock <= 0 ? 'out-of-stock' : ''}">
+                        ${p.stock > 0 ? 'Stok: ' + p.stock : 'Stok Habis'}
+                    </div>
+                    <p class="desc">${p.desc || '-'}</p>
+                    ${p.video ? `<video controls src="${p.video}"></video>` : ''}
+                </div>
+                <button class="buy" style="width:100%;margin-top:10px" onclick="addToCart('${p.id}')" ${p.stock <= 0 ? 'disabled' : ''}>
+                    ${p.stock > 0 ? '🛒 Tambah ke Keranjang' : '❌ Stok Habis'}
+                </button>
+            </div>
+        </div>
+    `).join("");
+}
+
+function openCart(){ renderCart(); document.getElementById("cartModal").classList.remove("hidden"); }
+function closeCart(){ document.getElementById("cartModal").classList.add("hidden"); }
+
+function renderCart(){
+    const container = document.getElementById("cartItems");
+    const cart = getCart();
+
+    if(cart.length === 0){
+        container.innerHTML = `<div class="empty">🛒 Keranjang masih kosong.</div>`;
+        document.getElementById("cartTotal").textContent = "";
+        return;
+    }
+
+    container.innerHTML = cart.map(item => `
+        <div class="cart-item">
+            <img src="${item.image}" onerror="this.src='https://via.placeholder.com/100'">
+            <div class="cart-info">
+                <h4>${item.name}</h4>
+                <div class="cart-price">${rupiah(item.price)}</div>
+                <div class="qty">
+                    <button onclick="changeQty('${item.productId}', -1)">−</button>
+                    <span>${item.qty}</span>
+                    <button onclick="changeQty('${item.productId}', 1)">+</button>
+                    <button class="danger" onclick="removeFromCart('${item.productId}')">🗑️</button>
+                </div>
+            </div>
+        </div>
+    `).join("");
+
+    const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+    document.getElementById("cartTotal").textContent = "Total: " + rupiah(total);
+}
+
+function changeQty(id, delta){
+    let cart = getCart();
+    const item = cart.find(i => String(i.productId) === String(id));
+    if(item){
+        item.qty += delta;
+        if(item.qty <= 0){ cart = cart.filter(i => String(i.productId) !== String(id)); }
+    }
+    saveCart(cart);
+    renderCart();
+    updateCartCount();
+}
+
+function removeFromCart(id){
+    let cart = getCart().filter(item => String(item.productId) !== String(id));
+    saveCart(cart);
+    renderCart();
+    updateCartCount();
+}
+
+function openCheckout(){
+    const cart = getCart();
+    if(cart.length === 0){ alert("🛒 Keranjang masih kosong!"); return; }
+    const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+    document.getElementById("checkoutTotal").textContent = "Total Pembayaran: " + rupiah(total);
+    closeCart();
+    document.getElementById("checkoutModal").classList.remove("hidden");
+}
+
+function closeCheckout(){ document.getElementById("checkoutModal").classList.add("hidden"); }
+
+function showPaymentDetail(method){
+    ["BNI", "BCA", "DANA"].forEach(item => {
+        const el = document.getElementById("detail" + item);
+        if(el) el.style.display = "none";
+    });
+    const selected = document.getElementById("detail" + method);
+    if(selected) selected.style.display = "block";
+}
+
+function processCheckout(){
+    const selected = document.querySelector('input[name="payment"]:checked');
+    if(!selected){ alert("Pilih metode pembayaran terlebih dahulu!"); return; }
+
+    const cart = getCart();
+    const user = localStorage.getItem("loggedUser");
+    let orders = JSON.parse(localStorage.getItem("orders") || "[]");
+    let products = JSON.parse(localStorage.getItem("products") || "[]");
+
+    cart.forEach(item => {
+        const pIndex = products.findIndex(p => String(p.id) === String(item.productId));
+        if(pIndex !== -1){
+            products[pIndex].stock = Math.max(0, products[pIndex].stock - item.qty);
+        }
+
+        orders.push({
+            id: Date.now() + Math.floor(Math.random() * 1000),
+            customer: user,
+            productName: item.name,
+            quantity: item.qty,
+            price: item.price,
+            total: item.price * item.qty,
+            payment: selected.value,
+            status: "Sudah Dibayar",
+            date: new Date().toLocaleString("id-ID")
+        });
+    });
+
+    localStorage.setItem("products", JSON.stringify(products));
+    localStorage.setItem("orders", JSON.stringify(orders));
+    saveCart([]);
+    closeCheckout();
+    updateCartCount();
+    renderProducts();
+    renderOrders();
+
+    alert("✅ PEMBAYARAN BERHASIL!\n\nMetode: " + selected.value);
+}
+
+function renderOrders(){
+    const container = document.getElementById("orders");
+    const user = localStorage.getItem("loggedUser");
+    const orders = JSON.parse(localStorage.getItem("orders") || "[]");
+    const myOrders = orders.filter(o => o.customer === user);
+
+    if(myOrders.length === 0){
+        container.innerHTML = `<div class="empty">📦 Belum ada pesanan.</div>`;
+        return;
+    }
+
+    container.innerHTML = myOrders.slice().reverse().map(order => {
+        const statusMap = { "Belum Dibayar": 1, "Sudah Dibayar": 2, "Sedang Dikemas": 3, "Sudah Dikirim": 4 };
+        const curr = statusMap[order.status] || 1;
+
+        return `
+        <div class="order">
+            <h3>📦 ${order.productName}</h3>
+            <p>Jumlah: <b>${order.quantity}</b></p>
+            <p>Total: <b>${rupiah(order.total)}</b></p>
+            <p>Pembayaran: <b>${order.payment}</b></p>
+            <p>Tanggal: ${order.date}</p>
+
+            <div class="tracking">
+                <div class="step ${curr >= 1 ? 'done' : ''}"><div class="circle">💰</div><small>Belum Dibayar</small></div>
+                <div class="line ${curr >= 2 ? 'done' : ''}"></div>
+                <div class="step ${curr >= 2 ? (curr === 2 ? 'active' : 'done') : ''}"><div class="circle">✅</div><small>Sudah Dibayar</small></div>
+                <div class="line ${curr >= 3 ? 'done' : ''}"></div>
+                <div class="step ${curr >= 3 ? (curr === 3 ? 'active' : 'done') : ''}"><div class="circle">📦</div><small>Sedang Dikemas</small></div>
+                <div class="line ${curr >= 4 ? 'done' : ''}"></div>
+                <div class="step ${curr >= 4 ? 'active' : ''}"><div class="circle">🚚</div><small>Sudah Dikirim</small></div>
+            </div>
+        </div>
+    `}).join("");
+}
+
+/* ================= ADMIN LOGIC ================= */
+function compressImage(file) {
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target.result;
+            img.onload = () => {
+                const canvas = document.createElement("canvas");
+                const MAX_WIDTH = 500;
+                const scaleSize = MAX_WIDTH / img.width;
+                canvas.width = MAX_WIDTH;
+                canvas.height = img.height * scaleSize;
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                resolve(canvas.toDataURL("image/jpeg", 0.7));
+            };
+        };
+    });
+}
+
+function fileToBase64(file){
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+document.getElementById("productImage").addEventListener("change", function(){
+    const file = this.files[0];
+    if(!file) return;
+    document.getElementById("imageName").textContent = file.name;
+    const preview = document.getElementById("imagePreview");
+    preview.src = URL.createObjectURL(file);
+    preview.style.display = "block";
+});
+
+document.getElementById("productVideo").addEventListener("change", function(){
+    const file = this.files[0];
+    if(!file) return;
+    document.getElementById("videoName").textContent = file.name;
+    const preview = document.getElementById("videoPreview");
+    preview.src = URL.createObjectURL(file);
+    preview.style.display = "block";
+});
+
+document.getElementById("productForm").addEventListener("submit", async function(e){
+    e.preventDefault();
+    const name = document.getElementById("productName").value.trim();
+    const price = Number(document.getElementById("productPrice").value);
+    const stock = Number(document.getElementById("productStock").value);
+    const desc = document.getElementById("productDesc").value.trim();
+    const imageFile = document.getElementById("productImage").files[0];
+    const videoFile = document.getElementById("productVideo").files[0];
+
+    let products = JSON.parse(localStorage.getItem("products") || "[]");
+
+    if(editingId){
+        const index = products.findIndex(p => String(p.id) === String(editingId));
+        if(index !== -1){
+            let image = products[index].image;
+            let video = products[index].video || "";
+
+            if(imageFile){ image = await compressImage(imageFile); }
+            if(videoFile){ video = await fileToBase64(videoFile); }
+
+            products[index] = { ...products[index], name, price, stock, desc, image, video };
+        }
+        editingId = null;
+        document.getElementById("cancelEdit").classList.add("hidden");
+        document.getElementById("formTitle").textContent = "➕ Tambah Produk Baru";
+    } else {
+        let image = await compressImage(imageFile);
+        let video = videoFile ? await fileToBase64(videoFile) : "";
+
+        products.push({ id: Date.now().toString(), name, price, stock, desc, image, video });
+    }
+
+    try {
+        localStorage.setItem("products", JSON.stringify(products));
+        alert("Berhasil menyimpan produk!");
+    } catch(err) {
+        alert("Ukuran video/gambar masih terlalu besar.");
+    }
+
+    document.getElementById("productForm").reset();
+    document.getElementById("imagePreview").style.display = "none";
+    document.getElementById("videoPreview").style.display = "none";
+    renderAdminProducts();
+});
+
+function renderAdminProducts(){
+    const container = document.getElementById("productList");
+    const products = JSON.parse(localStorage.getItem("products") || "[]");
+
+    if(products.length === 0){
+        container.innerHTML = `<div class="empty">📦 Belum ada produk.</div>`;
+        return;
+    }
+
+    container.innerHTML = products.map(p => `
+        <div class="product">
+            <img src="${p.image}">
+            <div class="product-body">
+                <h3>${p.name}</h3>
+                <div class="price">${rupiah(p.price)}</div>
+                <div class="stock-badge ${p.stock <= 0 ? 'out-of-stock' : ''}">
+                    ${p.stock > 0 ? 'Stok: ' + p.stock : 'Stok Habis'}
+                </div>
+                <p class="product-desc">${p.desc}</p>
+                <br>
+                <button class="edit" onclick="editProduct('${p.id}')">✏️ Edit</button>
+                <button class="delete" onclick="deleteProduct('${p.id}')">🗑️ Hapus</button>
+            </div>
+        </div>
+    `).join("");
+}
+
+function editProduct(id){
+    const products = JSON.parse(localStorage.getItem("products") || "[]");
+    const p = products.find(prod => String(prod.id) === String(id));
+    if(!p) return;
+
+    document.getElementById("productName").value = p.name;
+    document.getElementById("productPrice").value = p.price;
+    document.getElementById("productStock").value = p.stock;
+    document.getElementById("productDesc").value = p.desc;
+
+    editingId = id;
+    document.getElementById("productImage").removeAttribute("required");
+    document.getElementById("cancelEdit").classList.remove("hidden");
+    document.getElementById("formTitle").textContent = "✏️ Edit Produk";
+}
+
+function cancelEdit(){
+    editingId = null;
+    document.getElementById("productForm").reset();
+    document.getElementById("cancelEdit").classList.add("hidden");
+    document.getElementById("formTitle").textContent = "➕ Tambah Produk Baru";
+    document.getElementById("productImage").setAttribute("required", "");
+}
+
+function deleteProduct(id){
+    if(!confirm("Yakin ingin menghapus produk ini?")) return;
+    let products = JSON.parse(localStorage.getItem("products") || "[]");
+    products = products.filter(p => String(p.id) !== String(id));
+    localStorage.setItem("products", JSON.stringify(products));
+    renderAdminProducts();
+}
+
+function renderAdminOrders(){
+    const container = document.getElementById("orderList");
+    const orders = JSON.parse(localStorage.getItem("orders") || "[]");
+
+    if(orders.length === 0){
+        container.innerHTML = `<div class="empty">📦 Belum ada pesanan dari customer.</div>`;
+        return;
+    }
+
+    const statuses = ["Belum Dibayar", "Sudah Dibayar", "Sedang Dikemas", "Sudah Dikirim"];
+
+    container.innerHTML = orders.slice().reverse().map(order => `
+        <div class="order">
+            <h3>📦 ${order.productName}</h3>
+            <p><b>Customer:</b> ${order.customer}</p>
+            <p><b>Jumlah:</b> ${order.quantity}</p>
+            <p><b>Total:</b> ${rupiah(order.total)}</p>
+            <p><b>Tanggal:</b> ${order.date}</p>
+            <label><b>Ubah Status Pesanan:</b></label>
+            <select onchange="changeStatus('${order.id}', this.value)">
+                ${statuses.map(s => `<option value="${s}" ${order.status === s ? 'selected' : ''}>${s}</option>`).join('')}
+            </select>
+        </div>
+    `).join("");
+}
+
+function changeStatus(id, newStatus){
+    let orders = JSON.parse(localStorage.getItem("orders") || "[]");
+    const order = orders.find(o => String(o.id) === String(id));
+    if(order){
+        order.status = newStatus;
+        localStorage.setItem("orders", JSON.stringify(orders));
+        renderAdminOrders();
+        alert("Status pesanan diperbarui!");
+    }
+}
+
+// Check session saat load
+const loggedUser = localStorage.getItem("loggedUser");
+if(loggedUser){
+    showApp();
+}
+</script>
+</body>
+</html>
